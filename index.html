@@ -91,17 +91,18 @@
   <button id="reset">Restart</button>
 
   <script>
+    const baseURL = 'https://raw.githubusercontent.com/jmorenobs866/hosting/main/';
     const logos = [
-      { name: 'Big Ben', img: 'images/bigben.jpg' },
-      { name: 'Hermione - Leviosa', img: 'images/hp.jpg' },
-      { name: 'Joey - London Baby', img: 'images/joey.jpg' },
-      { name: 'Hand of God - Maradona', img: 'images/maradona.jpg' },
-      { name: 'Queen Elizabeth', img: 'images/reina.jpg' },
-      { name: 'UK Flag', img: 'images/reinounido.jpg' },
-      { name: 'Ross - We Were on a Break', img: 'images/ross.jpg' },
-      { name: 'Ken Robinson', img: 'images/EscudoKenRobinson.png' },
-      { name: 'Mark Twain School', img: 'images/EscudoMarkTwain.png' },
-      { name: 'British School', img: 'images/EscudoBritish.png' }
+      { name: 'Big Ben', img: baseURL + 'big_ben.jpg' },
+      { name: 'Hermione - Leviosa', img: baseURL + 'hp.jpg' },
+      { name: 'Joey - London Baby', img: baseURL + 'joey.jpg' },
+      { name: 'Hand of God - Maradona', img: baseURL + 'maradona.jpg' },
+      { name: 'Queen Elizabeth', img: baseURL + 'reina.jpg' },
+      { name: 'UK Flag', img: baseURL + 'reino_unido.jpg' },
+      { name: 'Ross - We Were on a Break', img: baseURL + 'ross.jpg' },
+      { name: 'Ken Robinson', img: baseURL + 'Ken_Robinson.png' },
+      { name: 'Mark Twain School', img: baseURL + 'ESCUDO_MARK_TWAIN.png' },
+      { name: 'British School', img: baseURL + 'Escudo_British.png' }
     ];
 
     let cards = [...logos, ...logos];
