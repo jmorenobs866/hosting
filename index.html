@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Let's Play</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      background: #f5f5f5;
+      margin: 0;
+    }
+    h1 {
+      margin-bottom: 10px;
+      font-size: 24px;
+    }
+    #game-board {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+      gap: 8px;
+      width: 90vw;
+      max-width: 400px;
+      margin-bottom: 20px;
+    }
+    .card {
+      width: 100%;
+      height: auto;
+      aspect-ratio: 1/1;
+      background: white;
+      border: 2px solid #ccc;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      user-select: none;
+      overflow: hidden;
+    }
+    .card img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: none;
+    }
+    .card.flipped img {
+      display: block;
+    }
+    .card.matched {
+      background: #d4edda;
+      pointer-events: none;
+    }
+    #reset {
+      margin-top: 10px;
+      padding: 10px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 5px;
+      background-color: #007bff;
+      color: white;
+      cursor: pointer;
+    }
+    #score-board, #timer {
+      font-size: 16px;
+      margin-bottom: 10px;
+    }
+    #trophy {
+      display: none;
+      width: 100px;
+      margin-top: 10px;
+    }
+    #timer span {
+      font-weight: bold;
+      font-size: 24px;
+      color: #ff0000;
+      transition: all 0.3s ease;
+    }
+  </style>
+</head>
+<body>
+  <h1>Let's Play</h1>
+  <p>Find the matching pairs to win!</p>
+  <div id="score-board">Score: <span id="score">0</span> / 10</div>
+  <div id="timer">Time left: <span id="time">30</span> seconds</div>
+  <div id="game-board"></div>
+  <img id="trophy" src="https://cdn-icons-png.flaticon.com/512/2583/2583344.png" alt="Gold Trophy">
+  <button id="reset">Restart</button>
+
+  <script>
+    const logos = [
+      { name: 'Big Ben', img: 'images/bigben.jpg' },
+      { name: 'Hermione - Leviosa', img: 'images/hp.jpg' },
+      { name: 'Joey - London Baby', img: 'images/joey.jpg' },
+      { name: 'Hand of God - Maradona', img: 'images/maradona.jpg' },
+      { name: 'Queen Elizabeth', img: 'images/reina.jpg' },
+      { name: 'UK Flag', img: 'images/reinounido.jpg' },
+      { name: 'Ross - We Were on a Break', img: 'images/ross.jpg' },
+      { name: 'Ken Robinson', img: 'images/EscudoKenRobinson.png' },
+      { name: 'Mark Twain School', img: 'images/EscudoMarkTwain.png' },
+      { name: 'British School', img: 'images/EscudoBritish.png' }
+    ];
+
+    let cards = [...logos, ...logos];
+    let firstCard = null;
+    let secondCard = null;
+    let score = 0;
+    let timeLeft = 30;
+    let timerInterval;
+    const board = document.getElementById('game-board');
+    const scoreEl = document.getElementById('score');
+    const timeEl = document.getElementById('time');
+    const trophyEl = document.getElementById('trophy');
+
+    function shuffle(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
+    }
+
+    function createBoard() {
+      clearInterval(timerInterval);
+      board.innerHTML = '';
+      score = 0;
+      scoreEl.textContent = '0';
+      trophyEl.style.display = 'none';
+      timeLeft = 30;
+      timeEl.textContent = timeLeft;
+      shuffle(cards);
+      cards.forEach((cardInfo) => {
+        const card = document.createElement('div');
+        card.classList.add('card');
+        card.dataset.name = cardInfo.name;
+
+        const img = document.createElement('img');
+        img.src = cardInfo.img;
+        img.alt = cardInfo.name;
+
+        card.appendChild(img);
+        card.addEventListener('click', () => flipCard(card));
+
+        board.appendChild(card);
+      });
+      startTimer();
+    }
+
+    function startTimer() {
+      timerInterval = setInterval(() => {
+        timeLeft--;
+        timeEl.textContent = timeLeft;
+        if (timeLeft === 0) {
+          clearInterval(timerInterval);
+          endGame();
+        }
+      }, 1000);
+    }
+
+    function endGame() {
+      const allCards = document.querySelectorAll('.card');
+      allCards.forEach(card => card.style.pointerEvents = 'none');
+      alert('Time is up! Your score was: ' + score);
+    }
+
+    function flipCard(card) {
+      if (card.classList.contains('flipped') || card.classList.contains('matched')) return;
+      card.classList.add('flipped');
+
+      if (!firstCard) {
+        firstCard = card;
+      } else {
+        secondCard = card;
+        checkMatch();
+      }
+    }
+
+    function checkMatch() {
+      const isMatch = firstCard.dataset.name === secondCard.dataset.name;
+
+      if (isMatch) {
+        firstCard.classList.add('matched');
+        secondCard.classList.add('matched');
+        score++;
+        scoreEl.textContent = score;
+
+        if (score === logos.length) {
+          trophyEl.style.display = 'block';
+          clearInterval(timerInterval);
+        }
+      } else {
+        setTimeout(() => {
+          firstCard.classList.remove('flipped');
+          secondCard.classList.remove('flipped');
+        }, 1000);
+      }
+
+      firstCard = null;
+      secondCard = null;
+    }
+
+    document.getElementById('reset').addEventListener('click', createBoard);
+
+    createBoard();
+  </script>
+</body>
+</html>
